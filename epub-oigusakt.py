@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
-from oigusakt import *
+from oigusakt import Oigusakt
 from ebooklib import epub
 from mako.template import Template
-with open("liiklusseadus.xml") as xml:
+
+file="relvaseadus"
+with open(f"{file}.xml") as xml:
     oigusakt = Oigusakt(xml)
 LANG="ee"
 book = epub.EpubBook()
@@ -29,6 +31,16 @@ book_disclaimer=epub.EpubHtml(
 book.add_item(book_disclaimer)
 book.spine.append(book_disclaimer)
 
+table_of_contents=epub.EpubHtml(
+    title='sisukord',
+    file_name='sisukord.xhtml',
+    lang=LANG,
+    content=Template(filename='templates/toc.mako').\
+        render(peatykid=oigusakt.sisu.peatykid)
+)
+book.add_item(table_of_contents)
+book.spine.append(table_of_contents)
+
 book_cover=epub.EpubHtml(
     title=oigusakt.aktinimi.nimi.pealkiri,
     file_name='esileht.xhtml',
@@ -38,6 +50,7 @@ book_cover=epub.EpubHtml(
 )
 book.add_item(book_cover)
 book.spine.append(book_cover)
+
 
 for peatykk in oigusakt.sisu.peatykid:
     book_chapter = epub.EpubHtml(
@@ -49,4 +62,4 @@ for peatykk in oigusakt.sisu.peatykid:
     book.add_item(book_chapter)
     book.spine.append(book_chapter)
 
-epub.write_epub('test.epub', book, {})
+epub.write_epub(f'{file}.epub', book, {})

@@ -14,7 +14,7 @@
 
 <%def name="makeParagrahv(paragrahv)">
     % if paragrahv.paragrahvPealkiri:
-        <h4>
+        <h4 id="${paragrahv.id}">
             ${paragrahv.kuvatavNr}
             ${paragrahv.paragrahvPealkiri}
         </h4>
@@ -29,8 +29,13 @@
 </%def>
 
 <%def name="makeJagu(jagu)">
-    <center><h3>${jagu.kuvatavNr}</h3></center>
-    <center><h3>${jagu.jaguPealkiri}</h3></center>
+    <center><h3 id="${jagu.id}">
+        ${jagu.kuvatavNr}
+    </h3></center>
+    <center>
+        <h3>
+            ${jagu.jaguPealkiri}
+        </h3></center>
     % for paragrahv in jagu.paragrahvid:
         ${makeParagrahv(paragrahv)}
     % endfor
