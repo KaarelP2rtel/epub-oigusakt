@@ -1,0 +1,2 @@
+import epuboigusakt
+epuboigusakt.main()

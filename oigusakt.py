@@ -1,1 +1,0 @@
-../oigusakt/oigusakt.py

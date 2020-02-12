@@ -1,5 +1,8 @@
 **/.vscode
 **/__pycache__
+**/dist
+**/build
+**/*egg*
 **.epub
 **.mobi
 **.xml
