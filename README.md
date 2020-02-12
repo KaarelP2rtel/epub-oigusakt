@@ -6,7 +6,7 @@ This is a python script that converts XML files from [Riigiteataja](https://www.
 ## Linux
 Install [Õigusakt python library](https://github.com/KaarelP2rtel/oigusakt)  
 `pip3 install https://github.com/KaarelP2rtel/oigusakt/releases/download/1.0.4/oigusakt_kaarelp2rtel-1.0.4-py3-none-any.whl`  
-Install the converter
+Install the converter  
 `pip3 install https://github.com/KaarelP2rtel/epub-oigusakt/releases/download/1.0.0/epub_oigusakt_kaarelp2rtel-1.0.0-py3-none-any.whl`  
 
 # Usage
