@@ -1,1 +1,2 @@
 Praeguse seisuga on dokumendist teadaolevalt puudu avaldamis- muutmismärkmed ning tehnilised märkmed.
+Dokumendis on olemas paragrahvid (koos alamjaotustega) sh paragrahvid, millel puudub tekst.

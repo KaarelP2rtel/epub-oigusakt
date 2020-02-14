@@ -1,54 +1,65 @@
 #!/usr/bin/env python3
 
-from oigusakt import Oigusakt
+from oigusakt import Seadus, Maarus
 from ebooklib import epub
 from mako.template import Template
 import argparse
 import os
 from multiprocessing import Pool
 import pkg_resources
+LANG='ee'
 
 def findTemplateFilename(name):
     resource_path = '/'.join(('templates', name))
     return pkg_resources.resource_filename(__name__, resource_path)
 
-def makeBook(filename,addDisclaimer = True,addToc = True):
+def makeDisclaimer():
+    with open(findTemplateFilename('texts/disclaimer.txt'),'r') as text:
+            disclaimer_text = text.read()
 
+    with open(findTemplateFilename('texts/info.txt')) as text:
+        info_text = text.read()
 
-    path=os.path.abspath(filename)
-    target=f"{os.path.splitext(path)[0]}.epub"
+    book_disclaimer=epub.EpubHtml(
+        title='Märkus',
+        file_name='disclaimer.xhtml',
+        lang=LANG,
+        content=Template(filename=findTemplateFilename('disclaimer.mako'))
+            .render(disclaimer=disclaimer_text,info=info_text)
+    )
+    return book_disclaimer
 
-    print(f'Converting {path}')
-
-    with open(filename) as xml:
-        oigusakt = Oigusakt(xml)
-    LANG='ee'
-
+def makeBase(akt,addDisclaimer=True):
     book = epub.EpubBook()
     book.set_language(LANG)
     book.spine = []
 
-    book.set_title(oigusakt.aktinimi.nimi.pealkiri)
-    book.add_author(oigusakt.metaandmed.valjaandja)
-
-
-
+    book.set_title(akt.aktinimi.nimi.pealkiri)
+    book.add_author(akt.metaandmed.valjaandja)
     if addDisclaimer:
-        with open(findTemplateFilename('texts/disclaimer.txt'),'r') as text:
-            disclaimer_text = text.read()
+        disclaimer=makeDisclaimer()
+        book.add_item(disclaimer)
+        book.spine.append(disclaimer)
+    
+    
+    return book
 
-        with open(findTemplateFilename('texts/info.txt')) as text:
-            info_text = text.read()
 
-        book_disclaimer=epub.EpubHtml(
-            title='Märkus',
-            file_name='disclaimer.xhtml',
-            lang=LANG,
-            content=Template(filename=findTemplateFilename('disclaimer.mako'))
-                .render(disclaimer=disclaimer_text,info=info_text)
-        )
-        book.add_item(book_disclaimer)
-        book.spine.append(book_disclaimer)
+def makeCover(akt):
+    cover=epub.EpubHtml(
+        title=akt.aktinimi.nimi.pealkiri,
+        file_name='esileht.xhtml',
+        lang=LANG,
+        content=Template(filename=findTemplateFilename('esileht.mako')).\
+            render(metaandmed=akt.metaandmed, aktinimi=akt.aktinimi)
+    )
+    return cover
+
+def makeSeadus(seadus,args,addDisclaimer = True,addToc = True):
+
+    book = makeBase(seadus,addDisclaimer=addDisclaimer)
+
+    
 
     if addToc:
         table_of_contents=epub.EpubHtml(
@@ -56,25 +67,17 @@ def makeBook(filename,addDisclaimer = True,addToc = True):
             file_name='sisukord.xhtml',
             lang=LANG,
             content=Template(filename=findTemplateFilename('toc.mako')).\
-                render(peatykid=oigusakt.sisu.peatykid)
+                render(peatykid=seadus.sisu.peatykid)
         )
         book.add_item(table_of_contents)
         book.spine.append(table_of_contents)
 
+    cover=makeCover(seadus)
+    book.add_item(cover)
+    book.spine.append(cover)
 
 
-    book_cover=epub.EpubHtml(
-        title=oigusakt.aktinimi.nimi.pealkiri,
-        file_name='esileht.xhtml',
-        lang=LANG,
-        content=Template(filename=findTemplateFilename('esileht.mako')).\
-            render(metaandmed=oigusakt.metaandmed, aktinimi=oigusakt.aktinimi)
-    )
-    book.add_item(book_cover)
-    book.spine.append(book_cover)
-
-
-    for peatykk in oigusakt.sisu.peatykid:
+    for peatykk in seadus.sisu.peatykid:
         book_chapter = epub.EpubHtml(
             title = peatykk.peatykkPealkiri,
             file_name = f'{peatykk.id}.xhtml',
@@ -83,9 +86,62 @@ def makeBook(filename,addDisclaimer = True,addToc = True):
         )
         book.add_item(book_chapter)
         book.spine.append(book_chapter)
+    
+    return book
+def makeMaarus(maarus,args,addDisclaimer = True,addToc = True):
+
+    book = makeBase(maarus,addDisclaimer=addDisclaimer)
+
+    
+
+    # if addToc:
+    #     table_of_contents=epub.EpubHtml(
+    #         title='sisukord',
+    #         file_name='sisukord.xhtml',
+    #         lang=LANG,
+    #         content=Template(filename=findTemplateFilename('toc.mako')).\
+    #             render(peatykid=seadus.sisu.peatykid)
+    #     )
+    #     book.add_item(table_of_contents)
+    #     book.spine.append(table_of_contents)
+
+    cover=makeCover(maarus)
+    book.add_item(cover)
+    book.spine.append(cover)
+
+
+    book_chapter = epub.EpubHtml(
+        title = maarus.aktinimi.nimi.pealkiri,
+        file_name = f'maarus.xhtml',
+        lang = LANG,
+        content=Template(filename=findTemplateFilename('maarus.mako')).render(maarus=maarus)
+    )
+    book.add_item(book_chapter)
+    book.spine.append(book_chapter)
+    return book
+
+
+
+def makeBook(filename,addDisclaimer = True,addToc = True):
+    path=os.path.abspath(filename)
+    target=f"{os.path.splitext(path)[0]}.epub"
+
+    print(f'Converting {path}')
+
+    with open(filename) as xml:
+        xmlstring = xml.read()
+
+    if 'tyviseadus' in xmlstring:
+        book = makeSeadus(Seadus(xmlstring),addDisclaimer,addToc)
+    elif 'maarus' in xmlstring:
+        book = makeMaarus(Maarus(xmlstring),addDisclaimer,addToc)
+    else:
+        print("Sellist akti ei oska ma töödelda :(")
+        exit
 
     epub.write_epub(target, book, {})
     print(f'Finished  {target}')
+
 def main():
     parser = argparse.ArgumentParser(description='Process riigiteataja xml files into epub files')
 
@@ -117,7 +173,6 @@ def main():
                     addToc=not args.omit_toc)
     else:
         parser.print_help()
-
 
 if __name__ == "__main__":
    main()
