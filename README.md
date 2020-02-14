@@ -1,5 +1,5 @@
 # Õigusakt epub converter
-This is a python script that converts XML files from [Riigiteataja](https://www.riigiteataja.ee/index.html) legal acts in XML to an epub format for use in E-readers.
+This is a python script that converts XML files from [Riigiteataja](https://www.riigiteataja.ee/index.html) legal acts from XML to an epub format for use in E-readers.
 
 
 # Installing
