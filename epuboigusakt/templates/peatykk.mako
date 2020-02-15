@@ -20,7 +20,7 @@
         </h4>
     % elif paragrahv.sisuTekst:
         <b>${paragrahv.kuvatavNr}</b>
-        ${paragrahv.sisuTekst.tavatekst}
+        ${paragrahv.sisuTekst.valmistekst}
     % endif
 
     % for loige in paragrahv.loiked:
@@ -29,16 +29,52 @@
 </%def>
 
 <%def name="makeJagu(jagu)">
-    <center><h3 id="${jagu.id}">
-        ${jagu.kuvatavNr}
-    </h3></center>
     <center>
-        <h3>
-            ${jagu.jaguPealkiri}
-        </h3></center>
-    % for paragrahv in jagu.paragrahvid:
-        ${makeParagrahv(paragrahv)}
-    % endfor
+        <h3 id="${jagu.id}">
+        ${jagu.kuvatavNr}<br/>
+        ${jagu.jaguPealkiri if jagu.jaguPealkiri else ''}
+        </h3>
+    </center>
+    % if jagu.paragrahvid:
+        % for paragrahv in jagu.paragrahvid:
+            ${makeParagrahv(paragrahv)}
+        % endfor
+    % elif jagu.jaotised:
+        % for jaotis in jagu.jaotised:
+            ${makeJaotis(jaotis)}
+        % endfor
+    % endif
+</%def>
+
+<%def name="makeJaotis(jaotis)">
+    <center>
+        <h3 id="${jaotis.id}">
+            ${jaotis.kuvatavNr}<br/>
+            ${jaotis.jaotisPealkiri}
+        </h3>
+    </center>
+    % if jaotis.paragrahvid:
+        % for paragrahv in jaotis.paragrahvid:
+            ${makeParagrahv(paragrahv)}
+        % endfor
+    % elif jaotis.alljaotised:
+        % for  alljaotis in jaotis.alljaotised:
+            ${makeAlljaotis(alljaotis)}
+        % endfor
+    % endif
+</%def>
+<%def name="makeAlljaotis(alljaotis)">
+    <center>
+        <h3 id="${alljaotis.id}">
+            ${alljaotis.kuvatavNr}<br/>
+            ${alljaotis.alljaotisPealkiri}
+        </h3>
+    </center>
+    % if alljaotis.paragrahvid:
+        % for paragrahv in alljaotis.paragrahvid:
+            ${makeParagrahv(paragrahv)}
+        % endfor
+    % endif
 </%def>
 
 <%def name="makeLoige(loige)">
@@ -47,7 +83,7 @@
             ${loige.kuvatavNr}
         % endif
         % if loige.sisuTekst:
-            ${loige.sisuTekst.tavatekst}
+            ${loige.sisuTekst.valmistekst}
         %endif
     </p>
 
@@ -64,7 +100,7 @@
     <li>
         ${alampunkt.kuvatavNr}
         % if alampunkt.sisuTekst:
-            ${alampunkt.sisuTekst.tavatekst}
+            ${alampunkt.sisuTekst.valmistekst}
         % endif
     </li>
 </%def>

@@ -41,9 +41,7 @@ def makeBase(akt,addDisclaimer=True):
         book.add_item(disclaimer)
         book.spine.append(disclaimer)
     
-    
     return book
-
 
 def makeCover(akt):
     cover=epub.EpubHtml(
@@ -51,15 +49,51 @@ def makeCover(akt):
         file_name='esileht.xhtml',
         lang=LANG,
         content=Template(filename=findTemplateFilename('esileht.mako')).\
-            render(metaandmed=akt.metaandmed, aktinimi=akt.aktinimi)
+            render(
+                metaandmed=akt.metaandmed, 
+                aktinimi=akt.aktinimi, 
+                viimanemarge=akt.muutmismarkmed[len(akt.muutmismarkmed)-1],
+                preambul=akt.sisu.preambul
+                )
     )
     return cover
+def makePeatykk(peatykk, filenameprefix=''):
+    page = epub.EpubHtml(
+            title = peatykk.peatykkPealkiri,
+            file_name = f'{filenameprefix}{peatykk.id}.xhtml',
+            lang = LANG,
+            content=Template(
+                filename=findTemplateFilename('peatykk.mako')).render(
+                    peatykk=peatykk,filenameprefix=filenameprefix
+                    )
+        )
+    return page
+
+       
+def makeOsa(osa):
+    page = epub.EpubHtml(
+            title = osa.osaPealkiri,
+            file_name = f'{osa.id}.xhtml',
+            lang = LANG,
+            content=Template(filename=findTemplateFilename('osa.mako')).render(osa=osa)
+        )
+    return page
+
+def makePseudoPeatykk(osa):
+    pseudoPeatykk = type('',(object,),{
+        'id':f"{osa.id}_pseudopeatykk",
+        'paragrahvid':osa.paragrahvid,
+        'peatykkPealkiri':'',
+        'kuvatavNr':'',
+        'peatykkNr':'',
+    })()
+    return pseudoPeatykk
+
 
 def makeSeadus(seadus,args,addDisclaimer = True,addToc = True):
 
     book = makeBase(seadus,addDisclaimer=addDisclaimer)
-
-    
+    sisu=seadus.sisu
 
     if addToc:
         table_of_contents=epub.EpubHtml(
@@ -67,7 +101,8 @@ def makeSeadus(seadus,args,addDisclaimer = True,addToc = True):
             file_name='sisukord.xhtml',
             lang=LANG,
             content=Template(filename=findTemplateFilename('toc.mako')).\
-                render(peatykid=seadus.sisu.peatykid)
+                render(sisu=sisu)
+
         )
         book.add_item(table_of_contents)
         book.spine.append(table_of_contents)
@@ -76,34 +111,35 @@ def makeSeadus(seadus,args,addDisclaimer = True,addToc = True):
     book.add_item(cover)
     book.spine.append(cover)
 
-
-    for peatykk in seadus.sisu.peatykid:
-        book_chapter = epub.EpubHtml(
-            title = peatykk.peatykkPealkiri,
-            file_name = f'{peatykk.id}.xhtml',
-            lang = LANG,
-            content=Template(filename=findTemplateFilename('peatykk.mako')).render(peatykk=peatykk)
-        )
-        book.add_item(book_chapter)
-        book.spine.append(book_chapter)
     
+
+    if sisu.peatykid:
+        for peatykk in sisu.peatykid:
+            peatykk = makePeatykk(peatykk)
+            book.add_item(peatykk)
+            book.spine.append(peatykk)
+          
+    elif sisu.osad:
+        for osa in sisu.osad:
+            osaPage=makeOsa(osa)
+            book.add_item(osaPage)
+            book.spine.append(osaPage)
+            if osa.peatykid:
+                for peatykk in osa.peatykid:
+                    pt = makePeatykk(peatykk,filenameprefix=osa.id)
+                    book.add_item(pt)
+                    book.spine.append(pt)
+
+            elif osa.paragrahvid:
+                pt = makePeatykk(makePseudoPeatykk(osa),filenameprefix=osa.id)
+                book.add_item(pt)
+                book.spine.append(pt)
+
     return book
+
 def makeMaarus(maarus,args,addDisclaimer = True,addToc = True):
 
     book = makeBase(maarus,addDisclaimer=addDisclaimer)
-
-    
-
-    # if addToc:
-    #     table_of_contents=epub.EpubHtml(
-    #         title='sisukord',
-    #         file_name='sisukord.xhtml',
-    #         lang=LANG,
-    #         content=Template(filename=findTemplateFilename('toc.mako')).\
-    #             render(peatykid=seadus.sisu.peatykid)
-    #     )
-    #     book.add_item(table_of_contents)
-    #     book.spine.append(table_of_contents)
 
     cover=makeCover(maarus)
     book.add_item(cover)

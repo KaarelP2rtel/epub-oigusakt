@@ -11,7 +11,7 @@
         </h4>
     % elif paragrahv.sisuTekst:
         <b>${paragrahv.kuvatavNr}</b>
-        ${paragrahv.sisuTekst.tavatekst}
+        ${paragrahv.sisuTekst.valmistekst}
     % endif
 
     % for loige in paragrahv.loiked:
@@ -26,7 +26,7 @@
             ${loige.kuvatavNr}
         % endif
         % if loige.sisuTekst:
-            ${loige.sisuTekst.tavatekst}
+            ${loige.sisuTekst.valmistekst}
         %endif
     </p>
 
@@ -43,7 +43,7 @@
     <li>
         ${alampunkt.kuvatavNr}
         % if alampunkt.sisuTekst:
-            ${alampunkt.sisuTekst.tavatekst}
+            ${alampunkt.sisuTekst.valmistekst}
         % endif
     </li>
 </%def>
