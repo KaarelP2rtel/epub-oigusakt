@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="epub-oigusakt-kaarelp2rtel",
-    version="1.1.0",
+    version="1.2.0",
     author="Kaarel Pärtel",
     author_email="kaarelp2rtel@gmail.com",
     description="Script that builds an epub from an Oigusakt",
