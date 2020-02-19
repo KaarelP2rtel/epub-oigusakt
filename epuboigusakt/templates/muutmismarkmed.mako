@@ -50,10 +50,3 @@
     % endif
     ${marge.RTartikkel}
 </%def>
-
-## <avaldamismarge>
-## 				<RTosa>RT I</RTosa>
-## 				<RTaasta>2009</RTaasta>
-## 				<RTnr>60</RTnr>
-## 				<RTartikkel>395</RTartikkel>
-## 				<aktViide>13240237</aktViide>

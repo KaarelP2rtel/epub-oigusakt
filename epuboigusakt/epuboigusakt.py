@@ -52,7 +52,6 @@ def makeCover(akt):
             render(
                 metaandmed=akt.metaandmed, 
                 aktinimi=akt.aktinimi, 
-                viimanemarge=akt.muutmismarkmed[len(akt.muutmismarkmed)-1],
                 preambul=akt.sisu.preambul
                 )
     )
@@ -159,7 +158,10 @@ def makeMaarus(maarus,args,addDisclaimer = True,addToc = True):
     cover=makeCover(maarus)
     book.add_item(cover)
     book.spine.append(cover)
-
+    if maarus.muutmismarkmed:
+        changesPage=makeChangesPage(maarus.muutmismarkmed)
+        book.add_item(changesPage)
+        book.spine.append(changesPage)
 
     book_chapter = epub.EpubHtml(
         title = maarus.aktinimi.nimi.pealkiri,

@@ -23,7 +23,9 @@
   
     </h1>
     <div>Vastu v&otilde;etud ${metaandmed.vastuvoetud.aktikuupaev}</div>
-    <div>J&otilde;ustumine ${metaandmed.vastuvoetud.joustumine}</div>
+    % if metaandmed.vastuvoetud.joustumine:
+        <div>J&otilde;ustumine ${metaandmed.vastuvoetud.joustumine}</div>
+    % endif
 </center>
 <br/>
 <br/>
