@@ -86,9 +86,19 @@ def makePseudoPeatykk(osa):
         'peatykkPealkiri':'',
         'kuvatavNr':'',
         'peatykkNr':'',
+        'muutmismarge': None,
+        'jaod': None
     })()
     return pseudoPeatykk
 
+def makeChangesPage(muutmismarkmed):
+    changesPage=epub.EpubHtml(
+        title='Muutmismärkmed',
+        file_name='muutmismarkmed.xhtml',
+        lang=LANG,
+        content=Template(filename=findTemplateFilename('muutmismarkmed.mako')).render(muutmismarkmed=muutmismarkmed)
+    )
+    return changesPage
 
 def makeSeadus(seadus,args,addDisclaimer = True,addToc = True):
 
@@ -101,7 +111,7 @@ def makeSeadus(seadus,args,addDisclaimer = True,addToc = True):
             file_name='sisukord.xhtml',
             lang=LANG,
             content=Template(filename=findTemplateFilename('toc.mako')).\
-                render(sisu=sisu)
+                render(sisu=sisu,muutmismarkmed=seadus.muutmismarkmed is not None)
 
         )
         book.add_item(table_of_contents)
@@ -110,6 +120,11 @@ def makeSeadus(seadus,args,addDisclaimer = True,addToc = True):
     cover=makeCover(seadus)
     book.add_item(cover)
     book.spine.append(cover)
+
+    if seadus.muutmismarkmed:
+        changes=makeChangesPage(seadus.muutmismarkmed)
+        book.add_item(changes)
+        book.spine.append(changes)
 
     
 

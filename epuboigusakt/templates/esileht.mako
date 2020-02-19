@@ -32,4 +32,11 @@
     <p>${preambul.valmistekst}</p>
 % endif
 
-    
+<%def name="makeAvaldamismarge(marge)">
+    ${marge.RTosa}
+    ${marge.RTaasta if marge.RTaasta else marge.avaldamineKuupaev},
+    % if marge.RTnr:
+        ${marge.RTnr} ,
+    % endif
+    ${marge.RTartikkel}
+</%def>

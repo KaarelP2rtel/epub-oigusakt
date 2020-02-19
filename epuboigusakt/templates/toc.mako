@@ -3,6 +3,11 @@
     <a href="esileht.xhtml">
         <h3>Esileht<h3>
     </a>
+    % if muutmismarkmed:
+    <a href="muutmismarkmed.xhtml">
+        <h3>Muutmism&auml;rkmed<h3>
+    </a>
+    % endif
     % if sisu.osad:
         % for osa in sisu.osad:
             ${makeOsa(osa)}            

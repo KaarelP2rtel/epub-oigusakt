@@ -2,30 +2,47 @@
 <h2>${peatykk.peatykkPealkiri}</h2>
 
 % if peatykk.paragrahvid:
+    % if peatykk.muutmismarge:
+        ${makeMuutmismarge(peatykk.muutmismarge)}
+    % endif
     % for paragrahv in peatykk.paragrahvid:
         ${makeParagrahv(paragrahv)}
     % endfor
 
-%elif peatykk.jaod:
+% elif peatykk.jaod:
     % for jagu in peatykk.jaod:
         ${makeJagu(jagu)}
     % endfor
 % endif
 
 <%def name="makeParagrahv(paragrahv)">
+
     % if paragrahv.paragrahvPealkiri:
         <h4 id="${paragrahv.id}">
             ${paragrahv.kuvatavNr}
             ${paragrahv.paragrahvPealkiri}
         </h4>
+        % if paragrahv.muutmismarge:
+            ${makeMuutmismarge(paragrahv.muutmismarge)}
+        % endif
     % elif paragrahv.sisuTekst:
-        <b>${paragrahv.kuvatavNr}</b>
+        <b id="${paragrahv.id}">${paragrahv.kuvatavNr}</b>
         ${paragrahv.sisuTekst.valmistekst}
+        % if paragrahv.muutmismarge:
+            ${makeMuutmismarge(paragrahv.muutmismarge)}
+        % endif
+    % else:
+        <b id="${paragrahv.id}">
+            ${paragrahv.kuvatavNr}
+        </b>
+        % if paragrahv.muutmismarge:
+            ${makeMuutmismarge(paragrahv.muutmismarge)}
+        % endif
     % endif
-
     % for loige in paragrahv.loiked:
         ${makeLoige(loige)}
-    %endfor
+    % endfor
+    
 </%def>
 
 <%def name="makeJagu(jagu)">
@@ -34,6 +51,9 @@
         ${jagu.kuvatavNr}<br/>
         ${jagu.jaguPealkiri if jagu.jaguPealkiri else ''}
         </h3>
+        % if jagu.muutmismarge:
+            ${makeMuutmismarge(jagu.muutmismarge)}
+        % endif
     </center>
     % if jagu.paragrahvid:
         % for paragrahv in jagu.paragrahvid:
@@ -52,6 +72,9 @@
             ${jaotis.kuvatavNr}<br/>
             ${jaotis.jaotisPealkiri}
         </h3>
+        % if jaotis.muutmismarge:
+                ${makeMuutmismarge(jaotis.muutmismarge)}
+        % endif
     </center>
     % if jaotis.paragrahvid:
         % for paragrahv in jaotis.paragrahvid:
@@ -69,6 +92,9 @@
             ${alljaotis.kuvatavNr}<br/>
             ${alljaotis.alljaotisPealkiri}
         </h3>
+        % if alljaotis.muutmismarge:
+                ${makeMuutmismarge(alljaotis.muutmismarge)}
+        % endif
     </center>
     % if alljaotis.paragrahvid:
         % for paragrahv in alljaotis.paragrahvid:
@@ -83,8 +109,11 @@
             ${loige.kuvatavNr}
         % endif
         % if loige.sisuTekst:
-            ${loige.sisuTekst.valmistekst}
+            ${loige.sisuTekst.valmistekst}<br/>
         %endif
+        % if loige.muutmismarge:
+            ${makeMuutmismarge(loige.muutmismarge)}
+        % endif
     </p>
 
     % if loige.alampunktid:
@@ -97,10 +126,28 @@
 </%def>
 
 <%def name="makeAlampunkt(alampunkt)">
+    % if alampunkt.sisuTekst:
     <li>
         ${alampunkt.kuvatavNr}
-        % if alampunkt.sisuTekst:
-            ${alampunkt.sisuTekst.valmistekst}
+        ${alampunkt.sisuTekst.valmistekst}
+    </li>
+        % if alampunkt.muutmismarge:
+            <li>
+                ${makeMuutmismarge(alampunkt.muutmismarge)}
+            </li>
+        % endif
+    % else:
+    <li>
+        ${alampunkt.kuvatavNr}
+        % if alampunkt.muutmismarge:
+                ${makeMuutmismarge(alampunkt.muutmismarge)}
         % endif
     </li>
+    %endif
+
+</%def>
+<%def name="makeMuutmismarge(marge)">
+    <font color="gray">
+        ${marge.valmismarge}
+    </font>
 </%def>
